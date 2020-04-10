@@ -1,10 +1,12 @@
 package com.eton.hookalipay;
 
 import android.content.Intent;
+import android.os.BaseBundle;
 import android.os.Bundle;
 import android.util.Log;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -28,43 +30,48 @@ public class MainHook implements IXposedHookLoadPackage {
             hookRecommandAlipayUserLoginActivity(lpparam.classLoader);
             hookLauncherActivity(lpparam.classLoader);
             hookMainCaptureActivity(lpparam.classLoader);
+            hookPayeeQRPayFormActivity(lpparam.classLoader);
         }
     }
 
     public void hookRecommandAlipayUserLoginActivity(ClassLoader classLoader) {
-        XposedHelpers.findAndHookMethod("com.alipay.mobile.security.login.ui.RecommandAlipayUserLoginActivity", classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                super.afterHookedMethod(param);
+        XposedHelpers.findAndHookMethod("com.alipay.mobile.security.login.ui.RecommandAlipayUserLoginActivity"
+                , classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        super.afterHookedMethod(param);
 
-                XposedBridge.log("AlipayLogin hook onCreate 成功");
-            }
-        });
+                        XposedBridge.log("AlipayLogin hook onCreate 成功");
+                    }
+                });
     }
 
     public void hookLauncherActivity(ClassLoader classLoader) {
-        XposedHelpers.findAndHookMethod("com.alipay.mobile.quinox.LauncherActivity", classLoader, "onResume", new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                super.afterHookedMethod(param);
+        XposedHelpers.findAndHookMethod("com.alipay.mobile.quinox.LauncherActivity"
+                , classLoader, "onResume", new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        super.afterHookedMethod(param);
 
-                XposedBridge.log("LauncherActivity hook onResume 成功");
-            }
-        });
+                        XposedBridge.log("LauncherActivity hook onResume 成功");
+                    }
+                });
     }
 
     public void hookMainCaptureActivity(ClassLoader classLoader) {
         try {
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity", classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
+            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
+                    , classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
 
-                    XposedBridge.log("MainCaptureActivity hook onCreate 成功");
-                }
-            });
+                            XposedBridge.log("MainCaptureActivity hook onCreate 成功");
+                        }
+                    });
 
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity", classLoader, "g"// m49199g
+            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
+                    , classLoader, "g"// m49199g
                     , new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -81,7 +88,8 @@ public class MainHook implements IXposedHookLoadPackage {
                     });
 
             // 目前沒有 Hook 到
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity", classLoader, "a" // mo107238a
+            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
+                    , classLoader, "a" // mo107238a
                     , "com.alipay.mobile.mascanengine.MaScanResult"
                     , new XC_MethodHook() {
                         @Override
@@ -106,7 +114,8 @@ public class MainHook implements IXposedHookLoadPackage {
                     });
 
             // 目前沒有 Hook 到
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity", classLoader, "b" // mo107241b
+            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
+                    , classLoader, "b" // mo107241b
                     , "com.alipay.mobile.mascanengine.MaScanResult"
                     , new XC_MethodHook() {
                         @Override
@@ -148,6 +157,123 @@ public class MainHook implements IXposedHookLoadPackage {
                     });
 
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void hookPayeeQRPayFormActivity(final ClassLoader classLoader) {
+        try {
+            final Class<?> PayeeQRPayFormActivity = classLoader.loadClass("com.alipay.mobile.payee.ui.PayeeQRPayFormActivity");
+
+            XposedHelpers.findAndHookMethod(PayeeQRPayFormActivity
+                    , "onCreate", Bundle.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook onCreate beforeHookedMethod 成功");
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook onCreate afterHookedMethod 成功");
+                        }
+                    });
+
+            Method privateMethod = XposedHelpers.findMethodExact(PayeeQRPayFormActivity, "__onCreate_stub_private", Bundle.class);
+            privateMethod.setAccessible(true);
+            XposedHelpers.findAndHookMethod(PayeeQRPayFormActivity
+                    , "__onCreate_stub_private", Bundle.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook __onCreate_stub_private beforeHookedMethod 成功");
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook __onCreate_stub_private afterHookedMethod 成功");
+                        }
+                    });
+
+            XposedHelpers.findAndHookMethod(PayeeQRPayFormActivity
+                    , "onActivityResult", int.class, int.class, Intent.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook onActivityResult beforeHookedMethod 成功");
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook onActivityResult afterHookedMethod 成功");
+                        }
+                    });
+
+            Method privateA = XposedHelpers.findMethodExact(PayeeQRPayFormActivity, "a", String.class);
+            privateA.setAccessible(true);
+            XposedHelpers.findAndHookMethod(PayeeQRPayFormActivity
+                    , "a" // m6032a
+                    , String.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook private a beforeHookedMethod 成功");
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook private a afterHookedMethod 成功");
+                        }
+                    });
+
+            final Method privateC = XposedHelpers.findMethodExact(PayeeQRPayFormActivity, "c");
+            privateC.setAccessible(true);
+            XposedHelpers.findAndHookMethod(PayeeQRPayFormActivity
+                    , "c" // m6034c
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook private c beforeHookedMethod 成功");
+                            Field zField = XposedHelpers.findField(param.thisObject.getClass(),"z");
+                            XposedBridge.log("field.toString = " + (String) zField.get(param.thisObject));
+//                            XposedBridge.log("name = "+field.getName() +  ", field.PayeeQRPayFormActivity  = " + field.get(PayeeQRPayFormActivity));
+//                            XposedHelpers.findAndHookMethod(BaseBundle.class
+//                                    , "getString"
+//                                    , String.class, new XC_MethodHook() {
+//                                        @Override
+//                                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                                            super.beforeHookedMethod(param);
+//                                            XposedBridge.log("PayeeQRPayFormActivity hook beforeHookedMethod getString = " + param.getResult());
+//                                        }
+//
+//                                        /**
+//                                         * result = {"a":"397.00","c":"2004096651498161","s":"online","u":"2088731738163665","m":"我是帥哥"}
+//                                         */
+//                                        @Override
+//                                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                                            super.afterHookedMethod(param);
+//                                            XposedBridge.log("PayeeQRPayFormActivity hook afterHookedMethod getString = " + param.getResult());
+//                                        }
+//                                    });
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("PayeeQRPayFormActivity hook private c afterHookedMethod 成功");
+                            XposedBridge.log("回傳:" + param.getResult());
+                        }
+                    });
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
