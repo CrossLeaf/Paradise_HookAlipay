@@ -1,7 +1,6 @@
 package com.eton.hookalipay;
 
 import android.content.Intent;
-import android.os.BaseBundle;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -243,27 +242,6 @@ public class MainHook implements IXposedHookLoadPackage {
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             super.beforeHookedMethod(param);
                             XposedBridge.log("PayeeQRPayFormActivity hook private c beforeHookedMethod 成功");
-                            Field zField = XposedHelpers.findField(param.thisObject.getClass(),"z");
-                            XposedBridge.log("field.toString = " + (String) zField.get(param.thisObject));
-//                            XposedBridge.log("name = "+field.getName() +  ", field.PayeeQRPayFormActivity  = " + field.get(PayeeQRPayFormActivity));
-//                            XposedHelpers.findAndHookMethod(BaseBundle.class
-//                                    , "getString"
-//                                    , String.class, new XC_MethodHook() {
-//                                        @Override
-//                                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                                            super.beforeHookedMethod(param);
-//                                            XposedBridge.log("PayeeQRPayFormActivity hook beforeHookedMethod getString = " + param.getResult());
-//                                        }
-//
-//                                        /**
-//                                         * result = {"a":"397.00","c":"2004096651498161","s":"online","u":"2088731738163665","m":"我是帥哥"}
-//                                         */
-//                                        @Override
-//                                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                                            super.afterHookedMethod(param);
-//                                            XposedBridge.log("PayeeQRPayFormActivity hook afterHookedMethod getString = " + param.getResult());
-//                                        }
-//                                    });
                         }
 
                         @Override
@@ -271,6 +249,12 @@ public class MainHook implements IXposedHookLoadPackage {
                             super.afterHookedMethod(param);
                             XposedBridge.log("PayeeQRPayFormActivity hook private c afterHookedMethod 成功");
                             XposedBridge.log("回傳:" + param.getResult());
+                            String zString = (String) XposedHelpers.getObjectField(param.thisObject, "z");
+                            try {
+                                XposedBridge.log("支付寶轉帳金額 = " + zString);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
         } catch (ClassNotFoundException e) {
