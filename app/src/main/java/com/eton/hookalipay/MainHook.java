@@ -1,5 +1,6 @@
 package com.eton.hookalipay;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,7 +30,10 @@ public class MainHook implements IXposedHookLoadPackage {
             hookRecommandAlipayUserLoginActivity(lpparam.classLoader);
             hookLauncherActivity(lpparam.classLoader);
             hookMainCaptureActivity(lpparam.classLoader);
+            hookPhotoSelectActivity(lpparam.classLoader);
+            hookPhotoContext(lpparam.classLoader);
             hookPayeeQRPayFormActivity(lpparam.classLoader);
+            hookLogger(lpparam.classLoader);
         }
     }
 
@@ -59,8 +63,9 @@ public class MainHook implements IXposedHookLoadPackage {
 
     public void hookMainCaptureActivity(ClassLoader classLoader) {
         try {
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
-                    , classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+            final Class<?> MainCaptureActivity = classLoader.loadClass("com.alipay.mobile.scan.as.main.MainCaptureActivity");
+            XposedHelpers.findAndHookMethod(MainCaptureActivity
+                    , "onCreate", Bundle.class, new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             super.afterHookedMethod(param);
@@ -69,8 +74,8 @@ public class MainHook implements IXposedHookLoadPackage {
                         }
                     });
 
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
-                    , classLoader, "g"// m49199g
+            XposedHelpers.findAndHookMethod(MainCaptureActivity
+                    , "g"// m49199g
                     , new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -87,8 +92,8 @@ public class MainHook implements IXposedHookLoadPackage {
                     });
 
             // 目前沒有 Hook 到
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
-                    , classLoader, "a" // mo107238a
+            XposedHelpers.findAndHookMethod(MainCaptureActivity
+                    , "a" // mo107238a
                     , "com.alipay.mobile.mascanengine.MaScanResult"
                     , new XC_MethodHook() {
                         @Override
@@ -113,8 +118,8 @@ public class MainHook implements IXposedHookLoadPackage {
                     });
 
             // 目前沒有 Hook 到
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
-                    , classLoader, "b" // mo107241b
+            XposedHelpers.findAndHookMethod(MainCaptureActivity
+                    , "b" // mo107241b
                     , "com.alipay.mobile.mascanengine.MaScanResult"
                     , new XC_MethodHook() {
                         @Override
@@ -138,8 +143,8 @@ public class MainHook implements IXposedHookLoadPackage {
                         }
                     });
 
-            XposedHelpers.findAndHookMethod("com.alipay.mobile.scan.as.main.MainCaptureActivity"
-                    , classLoader, "onActivityResult"
+            XposedHelpers.findAndHookMethod(MainCaptureActivity
+                    , "onActivityResult"
                     , int.class, int.class, Intent.class
                     , new XC_MethodHook() {
                         @Override
@@ -155,6 +160,87 @@ public class MainHook implements IXposedHookLoadPackage {
                         }
                     });
 
+            // hook __onActivityResult_stub_private
+            Method privateMethod = XposedHelpers.findMethodExact(MainCaptureActivity
+                    , "__onActivityResult_stub_private"
+                    , int.class, int.class, Intent.class);
+            privateMethod.setAccessible(true);
+            XposedHelpers.findAndHookMethod(MainCaptureActivity
+                    , "__onActivityResult_stub_private"
+                    , int.class, int.class, Intent.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("MainCaptureActivity hook __onActivityResult_stub_private beforeHookedMethod 成功");
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("MainCaptureActivity hook __onActivityResult_stub_private afterHookedMethod 成功");
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void hookPhotoSelectActivity(ClassLoader classLoader) {
+        try {
+            final Class<?> PhotoSelectActivity = classLoader.loadClass("com.alipay.mobile.beehive.photo.ui.PhotoSelectActivity");
+
+            // hook __onActivityResult_stub_private
+            Method privateMethod = XposedHelpers.findMethodExact(PhotoSelectActivity
+                    , "__onActivityResult_stub_private"
+                    , int.class, int.class, Intent.class);
+            privateMethod.setAccessible(true);
+            XposedHelpers.findAndHookMethod(PhotoSelectActivity
+                    , "__onActivityResult_stub_private"
+                    , int.class, int.class, Intent.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("PhotoSelectActivity hook __onActivityResult_stub_private beforeHookedMethod 成功");
+                            // i = 8899
+                            // i2 = -1
+                            XposedBridge.log("i = " + param.args[0]);
+                            XposedBridge.log("i2 = " + param.args[1]);
+                            XposedBridge.log("intent string = " + ((Intent) param.args[2]).getDataString());
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("PhotoSelectActivity hook __onActivityResult_stub_private afterHookedMethod 成功");
+                        }
+                    });
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void hookPhotoContext(ClassLoader classLoader) {
+        try {
+            final Class<?> PhotoContext = classLoader.loadClass("com.alipay.mobile.beehive.photo.data.PhotoContext");
+            XposedHelpers.findAndHookMethod(PhotoContext
+                    , "sendSelectedPhoto"
+                    , Activity.class, float.class, int.class, Runnable.class, boolean.class, boolean.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("PhotoContext hook sendSelectedPhoto beforeHookedMethod 成功");
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+//                            Class<?> zString = (String) XposedHelpers.getObjectField(param.thisObject, "z");
+                            XposedBridge.log("PhotoContext hook sendSelectedPhoto afterHookedMethod 成功");
+                        }
+                    });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -258,6 +344,49 @@ public class MainHook implements IXposedHookLoadPackage {
                         }
                     });
         } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void hookLogger(ClassLoader classLoader) {
+        try {
+            final Class<?> Logger = classLoader.loadClass("com.alipay.mobile.bqcscanservice.Logger");
+            XposedHelpers.findAndHookMethod(Logger, "d"
+                    , String.class, Object[].class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("Logger d arg0 = " + param.args[0]);
+                            Object[] obArray = (Object[]) param.args[1];
+                            for (Object ob : obArray) {
+                                XposedBridge.log("Logger d arg0 = " + ob);
+                            }
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                        }
+                    });
+
+
+            final Class<?> PhotoLogger = classLoader.loadClass("com.alipay.mobile.beehive.photo.util.PhotoLogger");
+            XposedHelpers.findAndHookMethod(PhotoLogger, "debug", String.class, String.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    XposedBridge.log("PhotoLogger hook debug beforeHookedMethod 成功");
+                    XposedBridge.log("debug str = " + param.args[0] + "\t str2 = " + param.args[1]);
+                }
+
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    XposedBridge.log("PhotoLogger hook debug afterHookedMethod 成功");
+                }
+            });
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
