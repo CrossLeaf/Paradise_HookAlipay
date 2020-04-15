@@ -1,6 +1,7 @@
 package com.eton.hookalipay;
 
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 
@@ -13,6 +14,24 @@ import de.robv.android.xposed.XposedHelpers;
 
 public class HideXposed {
     void hide(ClassLoader classLoader) {
+        /**
+         * 支付寶登入反hook
+         * 支付寶版本 10.1.90.9255 armeabi apk
+         */
+        XposedHelpers.findAndHookMethod(
+                "com.alipay.apmobilesecuritysdk.scanattack.common.ScanAttack",
+                classLoader,
+                "getAD104",
+                Context.class, int.class, int.class, boolean.class, int.class, int.class, String.class,
+                new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        super.afterHookedMethod(param);
+                        XposedBridge.log("getAD104 hook param = " + param.getResult());
+                        param.setResult(null);
+                    }
+                }
+        );
         XposedHelpers.findAndHookMethod("android.app.ApplicationPackageManager", classLoader, "getInstalledApplications", int.class, new XC_MethodHook() {
             protected void afterHookedMethod(MethodHookParam methodHookParam) {
                 List<ApplicationInfo> list = (List<ApplicationInfo>) methodHookParam.getResult();
