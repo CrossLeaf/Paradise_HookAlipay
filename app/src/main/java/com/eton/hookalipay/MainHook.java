@@ -31,7 +31,7 @@ public class MainHook implements IXposedHookLoadPackage {
             hookLauncherActivity(lpparam.classLoader);
             hookMainCaptureActivity(lpparam.classLoader);
             hookPhotoSelectActivity(lpparam.classLoader);
-            hookPhotoContext(lpparam.classLoader);
+//            hookPhotoContext(lpparam.classLoader);
             hookPayeeQRPayFormActivity(lpparam.classLoader);
             hookLogger(lpparam.classLoader);
         }
@@ -221,6 +221,11 @@ public class MainHook implements IXposedHookLoadPackage {
         }
     }
 
+    /**
+     * hook 此方法會導致支付寶在掃一掃的相簿裡選取照片，無法跳轉至轉帳頁面
+     *
+     * @param classLoader
+     */
     public void hookPhotoContext(ClassLoader classLoader) {
         try {
             final Class<?> PhotoContext = classLoader.loadClass("com.alipay.mobile.beehive.photo.data.PhotoContext");
