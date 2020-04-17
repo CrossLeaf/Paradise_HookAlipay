@@ -7,6 +7,8 @@ import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.UnknownHostException;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -34,6 +36,10 @@ public class MainHook implements IXposedHookLoadPackage {
 //            hookPhotoContext(lpparam.classLoader);
             hookPayeeQRPayFormActivity(lpparam.classLoader);
             hookLogger(lpparam.classLoader);
+            hookCodeRouteActivity(lpparam.classLoader);
+            hookBaseActivity(lpparam.classLoader);
+            hookSpmHelper(lpparam.classLoader);
+            hookGetIntent(lpparam.classLoader);
         }
     }
 
@@ -356,22 +362,38 @@ public class MainHook implements IXposedHookLoadPackage {
     public void hookLogger(ClassLoader classLoader) {
         try {
             final Class<?> Logger = classLoader.loadClass("com.alipay.mobile.bqcscanservice.Logger");
-            XposedHelpers.findAndHookMethod(Logger, "d"
+            XposedHelpers.findAndHookMethod(Logger, "d" //m47951d
                     , String.class, Object[].class
                     , new XC_MethodHook() {
+                        boolean isMTBizReporter = false;
+
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             super.beforeHookedMethod(param);
                             XposedBridge.log("Logger d arg0 = " + param.args[0]);
                             Object[] obArray = (Object[]) param.args[1];
                             for (Object ob : obArray) {
-                                XposedBridge.log("Logger d arg0 = " + ob);
+                                XposedBridge.log("Logger d arg1 = " + ob);
+                            }
+
+                            if (param.args[0].toString().contains("MTBizReporter")) {
+                                XposedBridge.log("==========");
+                                isMTBizReporter = true;
+                            } else {
+                                isMTBizReporter = false;
                             }
                         }
 
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             super.afterHookedMethod(param);
+                            if (isMTBizReporter) {
+                                XposedBridge.log("Logger afterHookedMethod");
+//                                param.setResult(null);
+                                // 加入此 Exception 可順利跳轉至轉帳頁面
+                                param.setResult(new Exception("Unknown exception"));
+//                                param.setThrowable(new UnknownHostException("unknow hhhhhost"));
+                            }
                         }
                     });
 
@@ -393,6 +415,116 @@ public class MainHook implements IXposedHookLoadPackage {
             });
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void hookCodeRouteActivity(ClassLoader classLoader) {
+        try {
+            final Class<?> CodeRouteActivity = classLoader.loadClass("com.alipay.mobile.scan.as.router.CodeRouteActivity");
+            XposedHelpers.findAndHookMethod(CodeRouteActivity
+                    , "onCreate"
+                    , Bundle.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("CodeRouteActivity hook onCreate beforeHookedMethod 成功");
+                        }
+                    });
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void hookBaseActivity(ClassLoader classLoader) {
+        try {
+            final Class<?> BaseActivity = classLoader.loadClass("com.alipay.mobile.framework.app.ui.BaseFragmentActivity");
+            XposedHelpers.findAndHookMethod(BaseActivity
+                    , "getActivityApplication"
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("BaseFragmentActivity hook getActivityApplication beforeHookedMethod 成功");
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("BaseFragmentActivity ActivityApplication = " + param.getResult());
+                            XposedBridge.log("BaseFragmentActivity hook getActivityApplication afterHookedMethod 成功");
+                        }
+                    });
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void hookSpmHelper(ClassLoader classLoader) {
+        try {
+
+            Class<?> SpmHelperClass = XposedHelpers.findClassIfExists("com.alipay.mobile.payee.util.SpmHelper$Monitor", classLoader);
+            if (SpmHelperClass == null) {
+                XposedBridge.log("SpmHelper = null");
+            } else {
+                XposedBridge.log("SpmHelper != null");
+                hookAllMethod(SpmHelperClass);
+            }
+
+            final Class<?> SpmHelper = classLoader.loadClass("com.alipay.mobile.payee.util.SpmHelper$Monitor");
+            XposedHelpers.findAndHookMethod(SpmHelper
+                    , "a" // m6144a
+                    , boolean.class, "com.alipay.transferprod.rpc.result.RPCResponse", Activity.class
+                    , new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            XposedBridge.log("SpmHelper hook a beforeHookedMethod 成功");
+                        }
+
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            XposedBridge.log("SpmHelper hook a afterHookedMethod 成功");
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void hookGetIntent(ClassLoader classLoader) {
+        try {
+            XposedHelpers.findAndHookMethod("android.app.Activity", classLoader, "getIntent", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Intent sou = (Intent) param.getResult();
+                    XposedBridge.log("hookGetIntent:" + sou.toURI());
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void hookAllMethod(Class<?> clazz) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            XposedBridge.log("所有方法名稱：" + method.getName());
+            if (method.getName().equals("方法")
+                    && !Modifier.isAbstract(method.getModifiers())
+                    && Modifier.isPublic(method.getModifiers())) {
+                XposedBridge.hookMethod(method, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        super.afterHookedMethod(param);
+                    }
+                });
+            }
         }
     }
 }

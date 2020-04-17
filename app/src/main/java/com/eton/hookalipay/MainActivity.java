@@ -12,9 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    String qrCodeURL = "https://qr.alipay.com/fkx13028e1j1oirmrwthi70"; // 暫不支持此種方式，請在支付寶內打開操作
+    String qrCodeURL = "https://qr.alipay.com/fkx15214gyaiipzdaez0c1b?t=1587090600573"; // 暫不支持此種方式，請在支付寶內打開操作
     private WebView webView;
 
     @Override
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //        intentToAlipay();
         webViewToAlipay();
+//        test123();
     }
 
     private void intentToAlipay() {
@@ -90,5 +93,16 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isModuleActive() {
         return false;
+    }
+    String a = "123456";
+    Map<String, String> mmap = new HashMap<>();
+    private void test123() {
+        if (mmap != null) {
+            String aaa = "aaa";
+            isModuleActive();
+        } else {
+            String bbb = "bbb";
+            webViewToAlipay();
+        }
     }
 }
