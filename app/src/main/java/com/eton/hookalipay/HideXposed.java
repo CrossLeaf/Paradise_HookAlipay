@@ -32,6 +32,7 @@ public class HideXposed {
                     }
                 }
         );
+        /*
         XposedHelpers.findAndHookMethod("android.app.ApplicationPackageManager", classLoader, "getInstalledApplications", int.class, new XC_MethodHook() {
             protected void afterHookedMethod(MethodHookParam methodHookParam) {
                 List<ApplicationInfo> list = (List<ApplicationInfo>) methodHookParam.getResult();
@@ -129,7 +130,7 @@ public class HideXposed {
                     methodHookParam.setResult(arrayList);
                 }
             }
-        });
+        });*/
     }
 
     private boolean isXposed(String str) {

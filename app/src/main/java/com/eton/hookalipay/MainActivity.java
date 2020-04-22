@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,30 +17,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    String qrCodeURL = "https://qr.alipay.com/fkx15214gyaiipzdaez0c1b?t=1587090600573"; // 暫不支持此種方式，請在支付寶內打開操作
+//    String qrCodeURL = "https://qr.alipay.com/fkx15333wmsxbsrkla5wzdb?t=1587524197818";   // 17元，暫不支持此種方式，請在支付寶內打開操作
+    String qrCodeURL = "https://qr.alipay.com/fkx13238jokttv2dzbwf336?t=1587462740354";     // 自行設定金額
     private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        webView = findViewById(R.id.wv_alipay);
+
         Toast.makeText(this, isModuleActive() ? "module is active" : "module not active", Toast.LENGTH_SHORT).show();
-//        Uri uri = Uri.parse("https://qr.alipay.com/fkx17131t7ucml5ews4qx74?t=1586507412835");
-//        Uri uri = Uri.parse("https://qr.alipay.com/fkx13028e1j1oirmrwthi70?t=1586847941929");
-//        Uri uri = Uri.parse("https://qr.alipay.com/fkx13028e1j1oirmrwthi70");
-//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-//        String intentFullUri = "alipays://platformapi/startapp?appId=10000007&url=https://qr.alipay.com/fkx13028e1j1oirmrwthi70";
-//        try {
-//            // "intent://platformapi/startapp?saId=10000007&qrcode=https://qr.alipay.com/fkx13028e1j1oirmrwthi70?#Intent;scheme=alipays;package=com.eg.android.AlipayGphone;end"
-//            Intent intent = Intent.parseUri(intentFullUri, Intent.URI_INTENT_SCHEME);
-//            startActivity(intent);
-//        } catch (URISyntaxException e) {
-//            e.printStackTrace();
-//        }
-//        intentToAlipay();
-        webViewToAlipay();
-//        test123();
+
+        webView = findViewById(R.id.wv_alipay);
+        Button broadcastBtn = findViewById(R.id.btn_broadcast);
+        Button intentBtn = findViewById(R.id.btn_intent);
+
+        intentBtn.setOnClickListener((v) -> intentToAlipay());
+        broadcastBtn.setOnClickListener(v -> broadcastToAlipay());
+//        webViewToAlipay();
     }
 
     private void intentToAlipay() {
@@ -91,18 +86,17 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl(qrCodeURL);
     }
 
+    private void broadcastToAlipay() {
+        Intent intent = getPackageManager().getLaunchIntentForPackage(MainHook.Alipay);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
+//        Intent broadCastIntent = new Intent();
+//        broadCastIntent.setAction(AlipayBroadcast.COOKIE_STR_INTENT_FILTER_ACTION);
+//        sendBroadcast(broadCastIntent);
+    }
+
     private boolean isModuleActive() {
         return false;
-    }
-    String a = "123456";
-    Map<String, String> mmap = new HashMap<>();
-    private void test123() {
-        if (mmap != null) {
-            String aaa = "aaa";
-            isModuleActive();
-        } else {
-            String bbb = "bbb";
-            webViewToAlipay();
-        }
     }
 }
