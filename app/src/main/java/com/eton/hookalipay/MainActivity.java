@@ -13,14 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-//    String qrCodeURL = "https://qr.alipay.com/fkx15333wmsxbsrkla5wzdb?t=1587524197818";   // 17元，暫不支持此種方式，請在支付寶內打開操作
-//    String qrCodeURL = "https://qr.alipay.com/fkx13238jokttv2dzbwf336?t=1587462740354";     // 自行設定金額
-    String qrCodeURL = "https://qr.alipay.com/fkx11610ffw88fueppfky39?t=1587539225274";     // 商家收款
-//    String qrCodeURL = "https://qr.alipay.com/fkx19699yf1mjdmiyi1jjc7";     // 小A給的收款
+    //    String qrCodeURL = "https://qr.alipay.com/fkx13238jokttv2dzbwf336?t=1587462740354";     // 自行設定金額
+    String qrCodeURL = "https://qr.alipay.com/fkx19699yf1mjdmiyi1jjc7";     // 小A給的收款
     private WebView webView;
 
     @Override
@@ -56,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void intentToBuisinessAlipay() {
-        String qrCodeURL = "https://qr.alipay.com/fkx11610ffw88fueppfky39?t=1587539225274";   // 17元，暫不支持此種方式，請在支付寶內打開操作
+        String qrCodeURL = "https://qr.alipay.com/fkx11610ffw88fueppfky39?t=1587539225274";   // 商家收款
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri uri = null;
         try {
