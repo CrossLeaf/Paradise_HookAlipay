@@ -18,7 +18,9 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 //    String qrCodeURL = "https://qr.alipay.com/fkx15333wmsxbsrkla5wzdb?t=1587524197818";   // 17元，暫不支持此種方式，請在支付寶內打開操作
-    String qrCodeURL = "https://qr.alipay.com/fkx13238jokttv2dzbwf336?t=1587462740354";     // 自行設定金額
+//    String qrCodeURL = "https://qr.alipay.com/fkx13238jokttv2dzbwf336?t=1587462740354";     // 自行設定金額
+    String qrCodeURL = "https://qr.alipay.com/fkx11610ffw88fueppfky39?t=1587539225274";     // 商家收款
+//    String qrCodeURL = "https://qr.alipay.com/fkx19699yf1mjdmiyi1jjc7";     // 小A給的收款
     private WebView webView;
 
     @Override
@@ -30,14 +32,31 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.wv_alipay);
         Button broadcastBtn = findViewById(R.id.btn_broadcast);
-        Button intentBtn = findViewById(R.id.btn_intent);
+        Button intentToMyBtn = findViewById(R.id.btn_intent_to_my);
+        Button intentToBusinessBtn = findViewById(R.id.btn_intent_to_business);
 
-        intentBtn.setOnClickListener((v) -> intentToAlipay());
+        intentToMyBtn.setOnClickListener((v) -> intentToMyAlipay());
+        intentToBusinessBtn.setOnClickListener((v) -> intentToBuisinessAlipay());
         broadcastBtn.setOnClickListener(v -> broadcastToAlipay());
 //        webViewToAlipay();
     }
 
-    private void intentToAlipay() {
+    private void intentToMyAlipay() {
+        String qrCodeURL = "https://qr.alipay.com/fkx15333wmsxbsrkla5wzdb?t=1587524197818";   // 17元，暫不支持此種方式，請在支付寶內打開操作
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri uri = null;
+        try {
+            uri = Uri.parse("alipays://platformapi/startapp?saId=10000007&qrcode=" + URLEncoder.encode(qrCodeURL, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
+    private void intentToBuisinessAlipay() {
+        String qrCodeURL = "https://qr.alipay.com/fkx11610ffw88fueppfky39?t=1587539225274";   // 17元，暫不支持此種方式，請在支付寶內打開操作
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri uri = null;
         try {

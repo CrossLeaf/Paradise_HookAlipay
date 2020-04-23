@@ -30,15 +30,24 @@
         app:layout_constraintTop_toBottomOf="@+id/textview" />
 
     <Button
-        android:id="@+id/btn_intent"
+        android:id="@+id/btn_intent_to_my"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Intent 跳轉"
+        android:text="Intent 跳轉個人帳戶"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.087"
         app:layout_constraintStart_toEndOf="@+id/btn_broadcast"
         app:layout_constraintTop_toBottomOf="@+id/textview" />
 
+    <Button
+        android:id="@+id/btn_intent_to_business"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Intent 跳轉商家號"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.087"
+        app:layout_constraintStart_toEndOf="@+id/btn_intent_to_my"
+        app:layout_constraintTop_toBottomOf="@+id/textview" />
     <WebView
         android:id="@+id/wv_alipay"
         android:layout_width="match_parent"
