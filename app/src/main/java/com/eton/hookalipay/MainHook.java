@@ -30,8 +30,6 @@ public class MainHook implements IXposedHookLoadPackage {
         if (lpparam.packageName.contains(Alipay)) {
             Log.d("MainHook", "handleLoadPackage: ");
             new HideXposed().hide(lpparam.classLoader);
-//            hookRecommandAlipayUserLoginActivity(lpparam.classLoader);
-//            hookLauncherActivity(lpparam.classLoader);
             hookMainCaptureActivity(lpparam.classLoader);
 //            hookPhotoSelectActivity(lpparam.classLoader);
 //            hookPhotoContext(lpparam.classLoader);
@@ -44,30 +42,6 @@ public class MainHook implements IXposedHookLoadPackage {
             hookPayeeApp(lpparam.classLoader);
 //            hookGetIntent(lpparam.classLoader);
         }
-    }
-
-    public void hookRecommandAlipayUserLoginActivity(ClassLoader classLoader) {
-        XposedHelpers.findAndHookMethod("com.alipay.mobile.security.login.ui.RecommandAlipayUserLoginActivity"
-                , classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        super.afterHookedMethod(param);
-
-                        XposedBridge.log("AlipayLogin hook onCreate 成功");
-                    }
-                });
-    }
-
-    public void hookLauncherActivity(ClassLoader classLoader) {
-        XposedHelpers.findAndHookMethod("com.alipay.mobile.quinox.LauncherActivity"
-                , classLoader, "onResume", new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        super.afterHookedMethod(param);
-
-                        XposedBridge.log("LauncherActivity hook onResume 成功");
-                    }
-                });
     }
 
     public void hookMainCaptureActivity(ClassLoader classLoader) {
@@ -238,32 +212,6 @@ public class MainHook implements IXposedHookLoadPackage {
                             XposedBridge.log("MainCaptureActivity hook mo107238a afterHookedMethod 成功");
                         }
                     });
-
-            // Hook mo107239a
-//            XposedHelpers.findAndHookMethod(MainCaptureActivity, "a"
-//                    , "com.alipay.mobile.mascanengine.MaScanResult", "com.alipay.mobile.scan.util.j"
-//                    , new XC_MethodHook() {
-//                        @Override
-//                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-//                            super.beforeHookedMethod(param);
-//                            XposedBridge.log("MainCaptureActivity hook mo107239a beforeHookedMethod 成功");
-////                            XposedBridge.log("MainCaptureActivity hook param 0 = " +param.args[0]);
-////                            XposedBridge.log("MainCaptureActivity hook param 1 = " +param.args[1]);
-////                            Class<?> MaScanResult = (Class<?>) param.args[0];
-////                            String zString = (String) XposedHelpers.getObjectField(param.thisObject, "z");
-//
-////                            Field[] fields = MaScanResult.getFields();
-////                            for (Field f : fields) {
-////                                XposedBridge.log("他的屬性有什麼呢 = " + f.getName());
-////                            }
-//                        }
-//
-//                        @Override
-//                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                            super.afterHookedMethod(param);
-//                            XposedBridge.log("MainCaptureActivity hook mo107239a afterHookedMethod 成功");
-//                        }
-//                    });
         } catch (Exception e) {
             e.printStackTrace();
             XposedBridge.log("hook MainCaptureActivity exception = " + e.getMessage());
@@ -297,7 +245,7 @@ public class MainHook implements IXposedHookLoadPackage {
             Field strategy = cls.getDeclaredField("strategy");
             strategy.set(MaScanResult, 512);
             Field text = cls.getDeclaredField("text");
-            text.set(MaScanResult, "https://qr.alipay.com/fkx15066nkvj69j8sxhytf6?t=1587640904945");
+            text.set(MaScanResult, "https://qr.alipay.com/fkx11610ffw88fueppfky39?t=1587539225274");
             Field totalEngineCpuTime = cls.getDeclaredField("totalEngineCpuTime");
             totalEngineCpuTime.set(MaScanResult, "444959");
             Field totalEngineTime = cls.getDeclaredField("totalEngineTime");
@@ -520,10 +468,6 @@ public class MainHook implements IXposedHookLoadPackage {
                             super.afterHookedMethod(param);
                             if (isMTBizReporter) {
                                 XposedBridge.log("Logger afterHookedMethod");
-//                                param.setResult(null);
-                                // 加入此 Exception 可順利跳轉至轉帳頁面
-//                                param.setResult(new Exception("Unknown exception"));
-//                                param.setThrowable(new UnknownHostException("unknow hhhhhost"));
                             }
                         }
                     });
@@ -589,30 +533,6 @@ public class MainHook implements IXposedHookLoadPackage {
         }
 
 
-    }
-
-    private void hookBaseActivity(ClassLoader classLoader) {
-        try {
-            final Class<?> BaseActivity = classLoader.loadClass("com.alipay.mobile.framework.app.ui.BaseFragmentActivity");
-            XposedHelpers.findAndHookMethod(BaseActivity
-                    , "getActivityApplication"
-                    , new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            super.beforeHookedMethod(param);
-                            XposedBridge.log("BaseFragmentActivity hook getActivityApplication beforeHookedMethod 成功");
-                        }
-
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            super.afterHookedMethod(param);
-                            XposedBridge.log("BaseFragmentActivity ActivityApplication = " + param.getResult());
-                            XposedBridge.log("BaseFragmentActivity hook getActivityApplication afterHookedMethod 成功");
-                        }
-                    });
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     private void hookSpmHelper(ClassLoader classLoader) {
