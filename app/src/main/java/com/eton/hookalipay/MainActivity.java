@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.eton.hookalipay.xposed.MainHook;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 

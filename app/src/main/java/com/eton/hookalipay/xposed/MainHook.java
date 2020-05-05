@@ -1,4 +1,4 @@
-package com.eton.hookalipay;
+package com.eton.hookalipay.xposed;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,6 +6,10 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+
+import com.eton.hookalipay.BuildConfig;
+import com.eton.hookalipay.MainActivity;
+import com.eton.hookalipay.xposed.HideXposed;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

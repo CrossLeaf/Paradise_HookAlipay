@@ -1,4 +1,4 @@
-package com.eton.hookalipay;
+package com.eton.hookalipay.xposed;
 
 import android.app.ActivityManager;
 import android.content.Context;
