@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 import java.lang.reflect.Field;
@@ -20,6 +21,8 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class MainHook implements IXposedHookLoadPackage {
     public static final String Alipay = "com.eg.android.AlipayGphone";
+    private Object MainCaptureActivityObject;
+    private int count = 0;
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -54,7 +57,12 @@ public class MainHook implements IXposedHookLoadPackage {
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             super.afterHookedMethod(param);
                             XposedBridge.log("MainCaptureActivity hook onCreate 成功");
-                            callmo107238aMethod(classLoader, param.thisObject);
+                            MainCaptureActivityObject = param.thisObject;
+//                            if (count < 2) {
+                            // FIXME:
+                                callmo107238aMethod(classLoader, param.thisObject);
+//                                count ++;
+//                            }
                         }
                     });
 
@@ -245,7 +253,12 @@ public class MainHook implements IXposedHookLoadPackage {
             Field strategy = cls.getDeclaredField("strategy");
             strategy.set(MaScanResult, 512);
             Field text = cls.getDeclaredField("text");
-            text.set(MaScanResult, "https://qr.alipay.com/fkx11610ffw88fueppfky39?t=1587539225274");
+            // FIXME: 更換成要改的 qrcode
+            if (count < 1) {
+                text.set(MaScanResult, "https://qr.alipay.com/fkx14686cncq01kdk4krn37?t=1587712956976");
+            } else {
+                text.set(MaScanResult, "https://qr.alipay.com/fkx18134dzrudbl9hjo7y58?t=1587713085315");
+            }
             Field totalEngineCpuTime = cls.getDeclaredField("totalEngineCpuTime");
             totalEngineCpuTime.set(MaScanResult, "444959");
             Field totalEngineTime = cls.getDeclaredField("totalEngineTime");
@@ -428,6 +441,14 @@ public class MainHook implements IXposedHookLoadPackage {
                             String zString = (String) XposedHelpers.getObjectField(param.thisObject, "z");
                             try {
                                 XposedBridge.log("支付寶轉帳金額 = " + zString);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        XposedBridge.log("呼叫轉帳方法");
+                                        // FIXME: 在收到 qrcode 後呼叫此 function
+                                        callmo107238aMethod(classLoader, MainCaptureActivityObject);
+                                    }
+                                }, 3000);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

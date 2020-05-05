@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
         intentToMyBtn.setOnClickListener((v) -> intentToMyAlipay());
         intentToBusinessBtn.setOnClickListener((v) -> intentToBuisinessAlipay());
         broadcastBtn.setOnClickListener(v -> broadcastToAlipay());
-//        webViewToAlipay();
     }
 
     private void intentToMyAlipay() {
@@ -105,10 +104,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getPackageManager().getLaunchIntentForPackage(MainHook.Alipay);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-
-//        Intent broadCastIntent = new Intent();
-//        broadCastIntent.setAction(AlipayBroadcast.COOKIE_STR_INTENT_FILTER_ACTION);
-//        sendBroadcast(broadCastIntent);
     }
 
     private boolean isModuleActive() {
