@@ -14,11 +14,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.eton.hookalipay.xposed.MainHook;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 
 public class MainActivity extends AppCompatActivity {
     //    String qrCodeURL = "https://qr.alipay.com/fkx13238jokttv2dzbwf336?t=1587462740354";     // 自行設定金額
     String qrCodeURL = "https://qr.alipay.com/fkx19699yf1mjdmiyi1jjc7";     // 小A給的收款
+    MyWebSocketClient client;
     private WebView webView;
 
     @Override
@@ -36,6 +38,13 @@ public class MainActivity extends AppCompatActivity {
         intentToMyBtn.setOnClickListener((v) -> intentToMyAlipay());
         intentToBusinessBtn.setOnClickListener((v) -> intentToBuisinessAlipay());
         broadcastBtn.setOnClickListener(v -> broadcastToAlipay());
+        initWebSocket();
+    }
+
+    @Override
+    protected void onDestroy() {
+        closeConnect();
+        super.onDestroy();
     }
 
     private void intentToMyAlipay() {
@@ -110,5 +119,31 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isModuleActive() {
         return false;
+    }
+
+    private void initWebSocket() {
+        URI uri = URI.create("ws://10.200.252.185:17803/register-mobile?token=da9a7a0c-968d-4aed-86c1-4f2dda2dc193");
+//        URI uri = URI.create("ws://dev-zqb.paradise-soft.com.tw:17803/register-mobile?token=da9a7a0c-968d-4aed-86c1-4f2dda2dc193");
+        client = new MyWebSocketClient(uri);
+        try {
+            client.connectBlocking();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 斷開連接
+     */
+    private void closeConnect() {
+        try {
+            if (null != client) {
+                client.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            client = null;
+        }
     }
 }
